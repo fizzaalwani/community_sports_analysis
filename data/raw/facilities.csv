@@ -1,0 +1,6 @@
+facility_id,facility_name,capacity,hourly_rate_pkr
+F001,Gym,80,500
+F002,Swimming Pool,60,700
+F003,Badminton,30,600
+F004,Basketball,40,500
+F005,Football,50,800
