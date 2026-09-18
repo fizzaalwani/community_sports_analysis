@@ -1,0 +1,545 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>{{ report_month }} Sports Complex Management Report</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-top: 35px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 6px;
+        }
+
+        h3 {
+            margin-top: 25px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .summary {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .kpi {
+            border: 1px solid #ddd;
+            padding: 15px;
+            min-width: 150px;
+            flex: 1;
+            border-radius: 6px;
+        }
+
+        .kpi-title {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 9px;
+            text-align: left;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        .insight {
+            background: #fafafa;
+            border-left: 4px solid #555;
+            padding: 12px 15px;
+            margin: 15px 0;
+        }
+
+        .recommendation {
+            padding: 10px 0;
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+
+        .positive {
+            font-weight: bold;
+        }
+
+        .negative {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <h1>Sports Complex Management Report</h1>
+
+    <div class="subtitle">
+        Reporting Period: {{ report_month }}
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- EXECUTIVE SUMMARY -->
+    <!-- ========================= -->
+
+    <h2>1. Executive Summary</h2>
+
+    <div class="summary">
+
+        <p>
+            {{ executive_summary }}
+        </p>
+
+        <p>
+            {{ activity_summary }}
+        </p>
+
+        <p>
+            {{ revenue_summary }}
+        </p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- KEY PERFORMANCE INDICATORS -->
+    <!-- ========================= -->
+
+    <h2>2. Key Performance Indicators</h2>
+
+    <div class="kpi-container">
+
+        <div class="kpi">
+            <div class="kpi-title">Total Members</div>
+            <div class="kpi-value">
+                {{ "{:,}".format(kpis.total_members) }}
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Active Members</div>
+            <div class="kpi-value">
+                {{ "{:,}".format(kpis.active_members) }}
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">New Members</div>
+            <div class="kpi-value">
+                {{ "{:,}".format(kpis.new_members) }}
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Total Visits</div>
+            <div class="kpi-value">
+                {{ "{:,}".format(growth.august_visits) }}
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-title">Revenue</div>
+            <div class="kpi-value">
+                PKR {{ "{:,.0f}".format(growth.august_revenue) }}
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- MEMBERSHIP -->
+    <!-- ========================= -->
+
+    <h2>3. Membership Health</h2>
+
+    <div class="insight">
+        {{ membership_summary }}
+    </div>
+
+    <h3>New Members by Membership Type</h3>
+
+    <table>
+        <tr>
+            <th>Membership Type</th>
+            <th>New Members</th>
+        </tr>
+
+        {% for row in new_member_membership %}
+        <tr>
+            <td>{{ row.membership_type }}</td>
+            <td>{{ "{:,}".format(row.member_count) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Membership Engagement</h3>
+
+    <table>
+        <tr>
+            <th>Membership Type</th>
+            <th>Members</th>
+            <th>Total Visits</th>
+            <th>Average Visits / Member</th>
+        </tr>
+
+        {% for row in membership_engagement %}
+        <tr>
+            <td>{{ row.membership_type }}</td>
+            <td>{{ "{:,}".format(row.members) }}</td>
+            <td>{{ "{:,}".format(row.total_visits) }}</td>
+            <td>{{ "%.2f"|format(row.average_visits_per_member) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Renewal Performance</h3>
+
+    <div class="insight">
+        {{ renewal_summary }}
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- MEMBER ENGAGEMENT -->
+    <!-- ========================= -->
+
+    <h2>4. Member Engagement</h2>
+
+    <div class="insight">
+        {{ engagement_summary }}
+    </div>
+
+
+    <h3>Engagement Levels</h3>
+
+    <table>
+        <tr>
+            <th>Engagement Level</th>
+            <th>Members</th>
+            <th>Percentage</th>
+        </tr>
+
+        {% for row in engagement_levels %}
+        <tr>
+            <td>{{ row.engagement_level }}</td>
+            <td>{{ "{:,}".format(row.member_count) }}</td>
+            <td>{{ "%.2f"|format(row.percentage) }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Visitor Types</h3>
+
+    <table>
+        <tr>
+            <th>Visitor Type</th>
+            <th>Members</th>
+        </tr>
+
+        {% for row in visitor_types %}
+        <tr>
+            <td>{{ row.visitor_type }}</td>
+            <td>{{ "{:,}".format(row.member_count) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Top Frequent Visitors</h3>
+
+    <table>
+        <tr>
+            <th>Member</th>
+            <th>Membership</th>
+            <th>Visits</th>
+        </tr>
+
+        {% for row in frequent_members %}
+        <tr>
+            <td>{{ row.member_name }}</td>
+            <td>{{ row.membership_type }}</td>
+            <td>{{ "{:,}".format(row.visits) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <!-- ========================= -->
+    <!-- FACILITY OPERATIONS -->
+    <!-- ========================= -->
+
+    <h2>5. Facility Usage & Operations</h2>
+
+    <div class="insight">
+        {{ facility_summary }}
+    </div>
+
+
+    <h3>Facility Usage</h3>
+
+    <table>
+        <tr>
+            <th>Facility</th>
+            <th>Visits</th>
+            <th>% of Total Visits</th>
+        </tr>
+
+        {% for row in facility_usage %}
+        <tr>
+            <td>{{ row.facility_name }}</td>
+            <td>{{ "{:,}".format(row.total_visits) }}</td>
+            <td>{{ "%.2f"|format(row.percentage_of_total_visits) }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Month-over-Month Facility Comparison</h3>
+
+    <table>
+        <tr>
+            <th>Facility</th>
+            <th>July Visits</th>
+            <th>August Visits</th>
+            <th>Growth</th>
+        </tr>
+
+        {% for row in facility_comparison %}
+        <tr>
+            <td>{{ row.facility_name }}</td>
+            <td>{{ "{:,.0f}".format(row.july_visits) }}</td>
+            <td>{{ "{:,.0f}".format(row.august_visits) }}</td>
+            <td>{{ "%.2f"|format(row.growth) }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Peak Usage</h3>
+
+    <div class="insight">
+        {{ peak_usage_summary }}
+    </div>
+
+
+    <h3>Facility Preferences by Gender</h3>
+
+    <table>
+        <tr>
+            <th>Gender</th>
+            <th>Most Used Facility</th>
+            <th>Visits</th>
+        </tr>
+
+        {% for row in gender_facilities %}
+        <tr>
+            <td>{{ row.gender }}</td>
+            <td>{{ row.facility_name }}</td>
+            <td>{{ "{:,}".format(row.total_visits) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Facility Preferences by Age Group</h3>
+
+    <table>
+        <tr>
+            <th>Age Group</th>
+            <th>Most Used Facility</th>
+            <th>Visits</th>
+        </tr>
+
+        {% for row in age_facilities %}
+        <tr>
+            <td>{{ row.age_group }}</td>
+            <td>{{ row.facility_name }}</td>
+            <td>{{ "{:,}".format(row.total_visits) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <!-- ========================= -->
+    <!-- TIME PATTERNS -->
+    <!-- ========================= -->
+
+    <h2>6. Usage Patterns</h2>
+
+    <div class="insight">
+        {{ usage_pattern_summary }}
+    </div>
+
+
+    <h3>Weekday vs Weekend</h3>
+
+    <table>
+        <tr>
+            <th>Period</th>
+            <th>Total Visits</th>
+            <th>Unique Members</th>
+        </tr>
+
+        {% for row in week_type %}
+        <tr>
+            <td>{{ row.period_type }}</td>
+            <td>{{ "{:,}".format(row.total_visits) }}</td>
+            <td>{{ "{:,}".format(row.unique_members) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3>Busiest Day</h3>
+
+    <div class="insight">
+        The busiest day during {{ report_month }} was
+        <strong>{{ busiest_day.full_date }}</strong>
+        ({{ busiest_day.day_name }}), with
+        <strong>{{ "{:,}".format(busiest_day.total_visits) }}</strong>
+        visits.
+    </div>
+
+
+    <h3>Peak Hour</h3>
+
+    <div class="insight">
+        The highest recorded activity occurred at
+        <strong>{{ busiest_hour.hour_of_day }}:00</strong>,
+        with
+        <strong>{{ "{:,}".format(busiest_hour.total_visits) }}</strong>
+        visits.
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- REVENUE -->
+    <!-- ========================= -->
+
+    <h2>7. Revenue & Payment Performance</h2>
+
+    <div class="insight">
+        {{ revenue_detail }}
+    </div>
+
+
+    <h3>Revenue by Membership Type</h3>
+
+    <table>
+        <tr>
+            <th>Membership Type</th>
+            <th>Transactions</th>
+            <th>Revenue</th>
+        </tr>
+
+        {% for row in membership_revenue %}
+        <tr>
+            <td>{{ row.membership_type }}</td>
+            <td>{{ "{:,}".format(row.payment_transactions) }}</td>
+            <td>PKR {{ "{:,.0f}".format(row.revenue) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <!-- ========================= -->
+    <!-- MEMBERS REQUIRING ATTENTION -->
+    <!-- ========================= -->
+
+    <h2>8. Members Requiring Attention</h2>
+
+    <div class="insight">
+        {{ inactive_summary }}
+    </div>
+
+    <table>
+        <tr>
+            <th>Member</th>
+            <th>Membership</th>
+            <th>Last Visit</th>
+            <th>Expiry Date</th>
+        </tr>
+
+        {% for row in inactive_members %}
+        <tr>
+            <td>{{ row.member_name }}</td>
+            <td>{{ row.membership_type }}</td>
+            <td>{{ row.last_visit }}</td>
+            <td>{{ row.expiry_date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <!-- ========================= -->
+    <!-- RECOMMENDATIONS -->
+    <!-- ========================= -->
+
+    <h2>9. Management Recommendations</h2>
+
+    {% for recommendation in recommendations %}
+        <div class="recommendation">
+            • {{ recommendation }}
+        </div>
+    {% endfor %}
+
+
+    <!-- ========================= -->
+    <!-- FOOTER -->
+    <!-- ========================= -->
+
+    <div class="footer">
+        Automated Management Report<br>
+        Generated for {{ report_month }}
+    </div>
+
+</body>
+</html>
