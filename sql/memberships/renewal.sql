@@ -23,5 +23,5 @@
     ) AS renewal_rate
 
 FROM dim_member
-WHERE expiry_date >= '2026-07-01'
-  AND expiry_date < '2026-08-01';
+WHERE expiry_date >= '{month_start}'
+  AND expiry_date < '{month_end}';

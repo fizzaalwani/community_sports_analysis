@@ -23,8 +23,8 @@ JOIN dim_facility f
 JOIN dim_date d
     ON a.date_key = d.date_key
 
-WHERE d.full_date >= '2026-07-01'
-  AND d.full_date < '2026-08-01'
+WHERE d.full_date >= '{month_start}'
+  AND d.full_date < '{month_end}'
 
 GROUP BY
     age_group,

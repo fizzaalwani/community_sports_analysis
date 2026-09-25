@@ -9,8 +9,8 @@ WITH day_usage AS (
         ON a.member_key = m.member_key
     JOIN dim_date d
         ON a.date_key = d.date_key
-    WHERE d.full_date >= '2026-08-01'
-      AND d.full_date < '2026-09-01'
+    WHERE d.full_date >= '{month_start}'
+      AND d.full_date < '{month_end}'
     GROUP BY
         m.gender,
         d.day_name,

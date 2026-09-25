@@ -35,8 +35,8 @@ FROM
 
     LEFT JOIN dim_date d
         ON a.date_key = d.date_key
-        AND d.full_date >= '2026-07-01'
-        AND d.full_date < '2026-08-01'
+        AND d.full_date >= '{month_start}'
+        AND d.full_date < '{month_end}'
 
     WHERE m.status = 'active'
 

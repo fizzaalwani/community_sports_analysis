@@ -20,6 +20,6 @@ SELECT
 
 FROM dim_member
 
-WHERE join_date >= '2026-08-01'
-  AND join_date < '2026-09-01';
+WHERE join_date >= '{month_start}'
+  AND join_date < '{month_end}';
   

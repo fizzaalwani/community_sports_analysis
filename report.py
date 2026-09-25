@@ -46,14 +46,7 @@ def run_queries(year, month):
     # Main SQL folder
     sql_root = Path("sql")
 
-    # Loop through folders such as:
-    # executive
-    # membership
-    # engagement
-    # facility
-    # operations
-    # revenue
-
+    # Loop through folders :
     for section_folder in sql_root.iterdir():
 
         # Ignore files; only process folders
@@ -87,7 +80,7 @@ def run_queries(year, month):
                 previous_start=previous_start
             )
 
-            # Execute SQL and convert result into DataFrame
+            # Execute SQL
             df = pd.read_sql(
                 query,
                 engine
@@ -142,10 +135,8 @@ def run_annual_queries(year):
 
 def generate_report_text(results, report_month):
 
-    # -----------------------------------
-    # EXECUTIVE
-    # -----------------------------------
 
+    # EXECUTIVE
     kpis = results["executive"]["kpis"].iloc[0]
     growth = results["executive"]["monthly_growth"].iloc[0]
 
@@ -153,21 +144,19 @@ def generate_report_text(results, report_month):
     active_members = int(kpis["active_members"])
     new_members = int(kpis["new_members"])
 
-    august_visits = int(growth["august_visits"])
-    july_visits = int(growth["july_visits"])
+    august_visits = int(growth["august_visits"] or 0)
+    july_visits = int(growth["july_visits"] or 0)
 
-    visit_growth = float(growth["visit_growth_percentage"])
+    visit_growth = float(growth["visit_growth_percentage"] or 0)
 
-    august_revenue = float(growth["august_revenue"])
-    july_revenue = float(growth["july_revenue"])
+    august_revenue = float(growth["august_revenue"] or 0)
+    july_revenue = float(growth["july_revenue"] or 0)
 
-    revenue_growth = float(growth["revenue_growth_percentage"])
+    revenue_growth = float(growth["revenue_growth_percentage"] or 0)
 
 
-    # -----------------------------------
+
     # EXECUTIVE SUMMARY
-    # -----------------------------------
-
     if visit_growth > 0:
         activity_direction = "increased"
     elif visit_growth < 0:
@@ -207,10 +196,9 @@ def generate_report_text(results, report_month):
     # -----------------------------------
     # MEMBERSHIP
     # -----------------------------------
-
     renewal = results["memberships"]["renewal"].iloc[0]
 
-    renewal_rate = float(renewal["renewal_rate"])
+    renewal_rate = float(renewal["renewal_rate"] or 0)
     expiring = int(renewal["memberships_expiring"])
 
     membership_summary = (
@@ -256,33 +244,86 @@ def generate_report_text(results, report_month):
 
     facility_usage = results["facility"]["visits"]
 
-    top_facility = facility_usage.iloc[0]
+    if not facility_usage.empty:
 
-    facility_summary = (
-        f"{top_facility['facility_name'].title()} was the most-used "
-        f"facility during the reporting period, recording "
-        f"{int(top_facility['total_visits']):,} visits and accounting for "
-        f"{float(top_facility['percentage_of_total_visits']):.2f}% "
-        f"of total facility visits."
-    )
+        top_facility = facility_usage.iloc[0]
+
+        facility_summary = (
+            f"{top_facility['facility_name'].title()} was the most-used "
+            f"facility during the reporting period, recording "
+            f"{int(top_facility['total_visits'] or 0):,} visits and accounting for "
+            f"{float(top_facility['percentage_of_total_visits'] or 0):.2f}% "
+            f"of total facility visits."
+        )
+
+    else:
+
+        facility_summary = (
+            "No facility usage data was available for the reporting period."
+        )
 
 
     # -----------------------------------
     # PEAK USAGE
     # -----------------------------------
 
-    busiest_day = results["engagement"]["busiest_day_of_month"].iloc[0]
+    # busiest_day = results["engagement"]["busiest_day_of_month"].iloc[0]
 
-    busiest_hour = results["facility"]["busiest_hour"].iloc[0]
+    busiest_day_df = results["engagement"]["busiest_day_of_month"]
+
+    print("========== BUSIEST DAY DEBUG ==========")
+    print(busiest_day_df)
+    print("Rows:", len(busiest_day_df))
+    print("Columns:", busiest_day_df.columns.tolist())
+    print("=======================================")
+
+    if not busiest_day_df.empty:
+        busiest_day = busiest_day_df.iloc[0]
+    else:
+        busiest_day = None
+
+    print("FACILITY RESULTS:", results["facility"].keys())
+
+    # busiest_hour = results["facility"]["busiest_hour"].iloc[0]
+    busiest_hour_df = results["facility"]["busiest_hour"]
+
+    if not busiest_hour_df.empty:
+        busiest_hour = busiest_hour_df.iloc[0]
+    else:
+        busiest_hour = None
 
     peak_usage_summary = (
         f"The busiest day was {busiest_day['day_name']}, "
         f"{busiest_day['full_date']}, with "
         f"{int(busiest_day['total_visits']):,} visits. "
-        f"The highest activity hour was "
-        f"{int(busiest_hour['hour_of_day'])}:00, with "
+        f"Across the entire reporting period, the highest activity hour was "
+        f"{int(busiest_hour['hour_of_day'])}:00, recording "
         f"{int(busiest_hour['total_visits']):,} visits."
     )
+
+
+    utilization_df = results['facility']['utilization']
+
+    utilization_lines = []
+
+    if not utilization_df.empty:
+        for _, row in utilization_df.iterrows():
+            facility_name = row["facility_name"].title()
+            utilization = float(row["utilization"] or 0)
+
+            utilization_lines.append( 
+                f"{facility_name}: {utilization:.2f}% utilization"
+                )
+        facility_utilization_summary = (
+        "Facility utilization during the reporting period was as follows: "
+        + "; ".join(utilization_lines)
+        + "."
+    )
+    else:
+        facility_utilization_summary = (
+            "No facility utilization data was available for the reporting period."
+        )
+
 
 
     # -----------------------------------
@@ -307,10 +348,8 @@ def generate_report_text(results, report_month):
     )
 
 
-    # -----------------------------------
-    # REVENUE
-    # -----------------------------------
 
+    # REVENUE
     membership_revenue = results["revenue"]["membership_revenue"]
 
     top_revenue_type = membership_revenue.iloc[
@@ -326,26 +365,26 @@ def generate_report_text(results, report_month):
     )
 
 
-    # -----------------------------------
     # INACTIVE MEMBERS
-    # -----------------------------------
-
     inactive_members = results["engagement"]["inactive_members"]
 
     inactive_count = len(inactive_members)
 
-    inactive_summary = (
-        f"{inactive_count:,} active members were identified as requiring "
-        f"attention based on the available visit activity data. "
-        f"These members may be candidates for targeted engagement or "
-        f"follow-up."
-    )
+    if inactive_count == 0:
+        inactive_summary = (
+            "No inactive members were identified during the reporting period "
+            "based on the available visit activity data."
+        )
+    else:
+        inactive_summary = (
+            f"{inactive_count:,} inactive members were identified as requiring "
+            f"attention based on the available visit activity data. "
+            f"These members may be candidates for targeted engagement or "
+            f"follow-up."
+        )
 
 
-    # -----------------------------------
     # RECOMMENDATIONS
-    # -----------------------------------
-
     recommendations = []
 
     if revenue_growth < 0:
@@ -382,6 +421,9 @@ def generate_report_text(results, report_month):
         f"capacity and staffing are aligned with demand."
     )
 
+    print("____________________________________________")
+    print(results['facility']['utilization'])
+
 
     return {
         "executive_summary": executive_summary,
@@ -394,6 +436,7 @@ def generate_report_text(results, report_month):
         "engagement_summary": engagement_summary,
 
         "facility_summary": facility_summary,
+         "facility_utilization_summary": facility_utilization_summary,
 
         "peak_usage_summary": peak_usage_summary,
         "usage_pattern_summary": usage_pattern_summary,
@@ -413,10 +456,8 @@ def generate_report(
     month=None
 ):
 
-    # --------------------------------------------------
+   
     # MONTHLY REPORT
-    # --------------------------------------------------
-
     if report_type == "monthly":
 
         # Run all monthly SQL queries
@@ -437,31 +478,23 @@ def generate_report(
         ).strftime("%B %Y")
 
 
-        # --------------------------------------------------
-        # GENERATE NARRATIVE TEXT
-        # --------------------------------------------------
 
+        # GENERATE NARRATIVE TEXT
         report_text = generate_report_text(
             results,
             report_month
         )
 
 
-        # --------------------------------------------------
         # PREPARE DATA FOR JINJA2
-        # --------------------------------------------------
-
         report_data = {
 
             "report_type": "Monthly",
 
             "report_month": report_month,
 
-
-            # ------------------------------
+          
             # EXECUTIVE
-            # ------------------------------
-
             "kpis":
                 results["executive"]["kpis"].iloc[0],
 
@@ -469,10 +502,7 @@ def generate_report(
                 results["executive"]["monthly_growth"].iloc[0],
 
 
-            # ------------------------------
             # ENGAGEMENT
-            # ------------------------------
-
             "engagement_levels":
                 results["engagement"]["engagement_level"]
                 .to_dict("records"),
@@ -490,10 +520,7 @@ def generate_report(
                 .to_dict("records"),
 
 
-            # ------------------------------
             # FACILITY
-            # ------------------------------
-
             "facility_usage":
                 results["facility"]["visits"]
                 .to_dict("records"),
@@ -511,27 +538,23 @@ def generate_report(
                 .to_dict("records"),
 
 
-            # ------------------------------
             # USAGE PATTERNS
-            # ------------------------------
-
             "week_type":
                 results["engagement"]["by_week_type"]
                 .to_dict("records"),
 
-            "busiest_day":
-                results["engagement"]["busiest_day_of_month"]
-                .iloc[0],
+            "busiest_day": (
+                results["engagement"]["busiest_day_of_month"].iloc[0]
+                if not results["engagement"]["busiest_day_of_month"].empty
+                else None
+            ),
 
             "busiest_hour":
                 results["facility"]["busiest_hour"]
-                .iloc[0],
+                .iloc[0] if not results["facility"]["busiest_hour"].empty
+                else None,
 
-
-            # ------------------------------
             # REVENUE
-            # ------------------------------
-
             "membership_revenue":
                 results["revenue"]["membership_revenue"]
                 .to_dict("records"),
@@ -541,17 +564,15 @@ def generate_report(
                 .to_dict("records"),
 
 
-            # ------------------------------
             # GENERATED NARRATIVE
-            # ------------------------------
 
             **report_text
         }
 
 
-    # --------------------------------------------------
+  
     # ANNUAL REPORT
-    # --------------------------------------------------
+
 
     elif report_type == "annual":
 
@@ -569,10 +590,8 @@ def generate_report(
         }
 
 
-    # --------------------------------------------------
-    # INVALID REPORT TYPE
-    # --------------------------------------------------
 
+    # INVALID REPORT TYPE
     else:
 
         raise ValueError(
@@ -580,10 +599,7 @@ def generate_report(
         )
 
 
-    # --------------------------------------------------
     # LOAD JINJA2 TEMPLATE
-    # --------------------------------------------------
-
     env = Environment(
         loader=FileSystemLoader("templates")
     )
@@ -593,19 +609,12 @@ def generate_report(
     )
 
 
-    # --------------------------------------------------
     # GENERATE HTML
-    # --------------------------------------------------
-
     print("REPORT DATA KEYS:")
     print(report_data.keys())
 
     print("KPIS:")
     print(report_data.get("kpis"))
-
-    html = template.render(
-        **report_data
-    )
 
     html = template.render(
         **report_data

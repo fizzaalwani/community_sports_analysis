@@ -1,112 +1,158 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
     <title>{{ report_month }} Sports Complex Management Report</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            color: #222;
-            line-height: 1.5;
-        }
+   <style>
+    * {
+        box-sizing: border-box;
+    }
 
-        h1 {
-            margin-bottom: 5px;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 25px 35px;
+        color: #222;
+        line-height: 1.4;
+        font-size: 13px;
+    }
 
-        h2 {
-            margin-top: 35px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 6px;
-        }
+    h1 {
+        font-size: 25px;
+        margin: 0 0 4px 0;
+    }
 
-        h3 {
-            margin-top: 25px;
-        }
+    h2 {
+        font-size: 17px;
+        margin-top: 25px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+    }
 
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-        }
+    h3 {
+        font-size: 14px;
+        margin-top: 18px;
+        margin-bottom: 8px;
+    }
 
-        .summary {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
+    .subtitle {
+        color: #777;
+        font-size: 12px;
+        margin-bottom: 18px;
+    }
 
-        .kpi-container {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+    /* Executive summary */
+    .summary {
+        background: #f7f7f7;
+        padding: 14px 16px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+        border: 1px solid #eee;
+    }
 
-        .kpi {
-            border: 1px solid #ddd;
-            padding: 15px;
-            min-width: 150px;
-            flex: 1;
-            border-radius: 6px;
-        }
+    .summary p {
+        margin: 5px 0;
+    }
 
-        .kpi-title {
-            font-size: 13px;
-            color: #666;
-        }
+    /* KPI CARDS */
+    .kpi-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
 
-        .kpi-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
+    .kpi {
+        border: 1px solid #e1e1e1;
+        padding: 11px 12px;
+        border-radius: 6px;
+        background: white;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
+    .kpi-title {
+        font-size: 11px;
+        color: #777;
+        margin-bottom: 4px;
+    }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 9px;
-            text-align: left;
-        }
+    .kpi-value {
+        font-size: 19px;
+        font-weight: bold;
+    }
 
-        th {
-            background: #f2f2f2;
-        }
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        margin-bottom: 14px;
+        font-size: 12px;
+    }
 
-        .insight {
-            background: #fafafa;
-            border-left: 4px solid #555;
-            padding: 12px 15px;
-            margin: 15px 0;
-        }
+    th,
+    td {
+        border: 1px solid #e3e3e3;
+        padding: 6px 8px;
+        text-align: left;
+    }
 
-        .recommendation {
-            padding: 10px 0;
-        }
+    th {
+        background: #f4f4f4;
+        font-weight: bold;
+    }
 
-        .footer {
-            margin-top: 50px;
-            font-size: 12px;
-            color: #777;
-            text-align: center;
-        }
+    tr:nth-child(even) {
+        background: #fafafa;
+    }
 
-        .positive {
-            font-weight: bold;
-        }
+    /* Insight boxes */
+    .insight {
+        background: #f8f8f8;
+        border-left: 3px solid #555;
+        padding: 9px 12px;
+        margin: 8px 0 14px 0;
+        border-radius: 3px;
+    }
 
-        .negative {
-            font-weight: bold;
-        }
-    </style>
+    /* Recommendations */
+    .recommendation {
+        background: #f8f8f8;
+        padding: 8px 12px;
+        margin: 6px 0;
+        border-radius: 4px;
+        border-left: 3px solid #555;
+    }
+
+    /* Footer */
+    .footer {
+        margin-top: 30px;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+        font-size: 10px;
+        color: #888;
+        text-align: center;
+    }
+
+    .positive {
+        font-weight: bold;
+    }
+
+    .negative {
+        font-weight: bold;
+    }
+
+    /* Prevent tables from splitting awkwardly */
+    tr {
+        page-break-inside: avoid;
+    }
+
+    h2, h3 {
+        page-break-after: avoid;
+    }
+</style>
 </head>
 
 <body>
@@ -201,9 +247,9 @@
         {{ membership_summary }}
     </div>
 
-    <h3>New Members by Membership Type</h3>
+    <!-- <h3>New Members by Membership Type</h3> -->
 
-    <table>
+    <!-- <table>
         <tr>
             <th>Membership Type</th>
             <th>New Members</th>
@@ -215,7 +261,7 @@
             <td>{{ "{:,}".format(row.member_count) }}</td>
         </tr>
         {% endfor %}
-    </table>
+    </table> -->
 
 
     <h3>Membership Engagement</h3>
@@ -347,27 +393,20 @@
     <table>
         <tr>
             <th>Facility</th>
-            <th>July Visits</th>
-            <th>August Visits</th>
+           <th>Prvious Month Visits</th>
+            <th>Current Month Visits</th>
             <th>Growth</th>
         </tr>
 
         {% for row in facility_comparison %}
         <tr>
             <td>{{ row.facility_name }}</td>
-            <td>{{ "{:,.0f}".format(row.july_visits) }}</td>
-            <td>{{ "{:,.0f}".format(row.august_visits) }}</td>
+            <td>{{ "{:,.0f}".format(row.previous_month_visits) }}</td>
+            <td>{{ "{:,.0f}".format(row.current_month_visits) }}</td>
             <td>{{ "%.2f"|format(row.growth) }}%</td>
         </tr>
         {% endfor %}
     </table>
-
-
-    <h3>Peak Usage</h3>
-
-    <div class="insight">
-        {{ peak_usage_summary }}
-    </div>
 
 
     <h3>Facility Preferences by Gender</h3>
@@ -406,6 +445,12 @@
         </tr>
         {% endfor %}
     </table>
+
+    <h3>Facility Utilization</h3>
+
+    <p>
+        {{ facility_utilization_summary }}
+    </p>
 
 
     <!-- ========================= -->
@@ -452,9 +497,10 @@
     <h3>Peak Hour</h3>
 
     <div class="insight">
-        The highest recorded activity occurred at
+        Across the entire {{ report_month }} reporting period, the
+        highest activity hour was
         <strong>{{ busiest_hour.hour_of_day }}:00</strong>,
-        with
+        recording
         <strong>{{ "{:,}".format(busiest_hour.total_visits) }}</strong>
         visits.
     </div>
@@ -500,41 +546,41 @@
         {{ inactive_summary }}
     </div>
 
-    <table>
-        <tr>
-            <th>Member</th>
-            <th>Membership</th>
-            <th>Last Visit</th>
-            <th>Expiry Date</th>
-        </tr>
+    {% if inactive_members %}
+<table>
+    <tr>
+        <th>Member</th>
+        <th>Membership</th>
+        <th>Last Visit</th>
+        <th>Expiry Date</th>
+    </tr>
 
-        {% for row in inactive_members %}
-        <tr>
-            <td>{{ row.member_name }}</td>
-            <td>{{ row.membership_type }}</td>
-            <td>{{ row.last_visit }}</td>
-            <td>{{ row.expiry_date }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    {% for row in inactive_members %}
+    <tr>
+        <td>{{ row.member_name }}</td>
+        <td>{{ row.membership_type }}</td>
+        <td>{{ row.last_visit }}</td>
+        <td>{{ row.expiry_date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
 
 
-    <!-- ========================= -->
+  
     <!-- RECOMMENDATIONS -->
-    <!-- ========================= -->
 
     <h2>9. Management Recommendations</h2>
 
     {% for recommendation in recommendations %}
-        <div class="recommendation">
-            • {{ recommendation }}
-        </div>
+    <div class="recommendation">
+        • {{ recommendation }}
+    </div>
     {% endfor %}
 
 
-    <!-- ========================= -->
+
     <!-- FOOTER -->
-    <!-- ========================= -->
 
     <div class="footer">
         Automated Management Report<br>
@@ -542,4 +588,5 @@
     </div>
 
 </body>
+
 </html>

@@ -15,7 +15,7 @@ LEFT JOIN fact_attendance a
 LEFT JOIN dim_date d
     ON a.date_key = d.date_key
 
-WHERE  d.month_number = 6 and d.year =2026 and m.status = 'Active'
+WHERE  d.month_number = '{month}' and d.year ='{year}' and m.status = 'Active'
 
 GROUP BY
     m.member_id,

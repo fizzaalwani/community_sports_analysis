@@ -29,8 +29,8 @@ FROM
             FROM fact_payment p
             JOIN dim_date d2
                 ON p.date_key = d2.date_key
-            WHERE d2.full_date >= '2026-08-01'
-              AND d2.full_date < '2026-09-01'
+            WHERE d2.full_date >= '{month_start}'
+              AND d2.full_date < '{month_end}'
               AND p.payment_status = 'paid'
         ) AS revenue
 
@@ -38,8 +38,8 @@ FROM
     JOIN dim_date d
         ON a.date_key = d.date_key
 
-    WHERE d.full_date >= '2026-08-01'
-      AND d.full_date < '2026-09-01'
+    WHERE d.full_date >= '{month_start}'
+      AND d.full_date < '{month_end}'
 ) current_month
 
 CROSS JOIN
@@ -53,8 +53,8 @@ CROSS JOIN
             FROM fact_payment p
             JOIN dim_date d2
                 ON p.date_key = d2.date_key
-            WHERE d2.full_date >= '2026-07-01'
-              AND d2.full_date < '2026-08-01'
+            WHERE d2.full_date >= '{previous_start}'
+              AND d2.full_date < '{month_start}'
               AND p.payment_status = 'paid'
         ) AS revenue
 
@@ -62,6 +62,6 @@ CROSS JOIN
     JOIN dim_date d
         ON a.date_key = d.date_key
 
-    WHERE d.full_date >= '2026-07-01'
-      AND d.full_date < '2026-08-01'
+    WHERE d.full_date >= '{previous_start}'
+      AND d.full_date < '{month_start}'
 ) previous_month;

@@ -1,5 +1,5 @@
--- Show me all currently active members who have either never visited, or whose most recent
--- visit was before September 1, 2026."
+-- Active members who had no visit in the previous month, or whose last visit was before the 
+-- previous month.
 SELECT
     m.member_id,
     m.member_name,
@@ -26,7 +26,7 @@ GROUP BY
 
 HAVING
     MAX(d.full_date) IS NULL
-    OR MAX(d.full_date) < '2026-08-01'
+    OR MAX(d.full_date) < '{previous_start}'
 
 ORDER BY
     last_visit;

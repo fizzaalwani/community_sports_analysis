@@ -1,30 +1,25 @@
 -- utilization rate of facilites
-SELECT
-    m.membership_type,
+SELECT 
+    f.facility_name,
 
-    COUNT(DISTINCT m.member_key) AS members,
+    COUNT(a.check_in_time) AS visits,
 
-    COUNT(a.attendance_key) AS total_visits,
+    28 * 10 AS assumed_capacity_hours,
 
     ROUND(
-        COUNT(a.attendance_key) /
-        COUNT(DISTINCT m.member_key),
+        (COUNT(a.check_in_time) / (28 * 10)) * 100,
         2
-    ) AS average_visits_per_member
+    ) AS utilization
 
-FROM dim_member m
+FROM fact_attendance a
 
-LEFT JOIN fact_attendance a
-    ON m.member_key = a.member_key
+INNER JOIN dim_facility f 
+    ON a.facility_key = f.facility_key
 
-LEFT JOIN dim_date d
-    ON a.date_key = d.date_key
-    AND d.full_date >= '2026-08-01'
-    AND d.full_date < '2026-09-01'
+INNER JOIN dim_date d 
+    ON d.date_key = a.date_key
 
-WHERE m.status = 'Active'
+WHERE d.full_date >= '{month_start}'
+  AND d.full_date < '{month_end}'
 
-GROUP BY m.membership_type
-
-ORDER BY average_visits_per_member DESC;
-
+GROUP BY f.facility_name;

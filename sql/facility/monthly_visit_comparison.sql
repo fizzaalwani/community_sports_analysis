@@ -3,35 +3,35 @@ SELECT
     f.facility_name, 
     
     SUM(CASE 
-        WHEN d.full_date >= '2026-07-01' 
-         AND d.full_date < '2026-08-01'
+        WHEN d.full_date >= '{previous_start}' 
+         AND d.full_date < '{month_start}'
         THEN 1 ELSE 0 
-    END) AS july_visits,
+    END) AS previous_month_visits,
         
     SUM(CASE
-        WHEN d.full_date >= '2026-08-01' 
-         AND d.full_date < '2026-09-01' 
+        WHEN d.full_date >= '{month_start}' 
+         AND d.full_date < '{month_end}' 
         THEN 1 ELSE 0 
-    END) AS august_visits,
+    END) AS current_month_visits,
         
     (
         (
             SUM(CASE
-                WHEN d.full_date >= '2026-08-01' 
-                 AND d.full_date < '2026-09-01' 
+                WHEN d.full_date >= '{month_start}' 
+                 AND d.full_date < '{month_end}' 
                 THEN 1 ELSE 0 
             END) 
             - 
             SUM(CASE 
-                WHEN d.full_date >= '2026-07-01' 
-                 AND d.full_date < '2026-08-01'
+                WHEN d.full_date >= '{previous_start}' 
+                 AND d.full_date < '{month_start}'
                 THEN 1 ELSE 0 
             END)
         ) 
         / 
         SUM(CASE
-            WHEN d.full_date >= '2026-08-01' 
-             AND d.full_date < '2026-09-01' 
+            WHEN d.full_date >= '{month_start}' 
+             AND d.full_date < '{month_end}' 
             THEN 1 ELSE 0 
         END) 
         * 100
@@ -43,7 +43,7 @@ INNER JOIN dim_date d
 INNER JOIN dim_facility f 
     ON f.facility_key = a.facility_key
 
-WHERE d.full_date >= '2026-07-01' 
-  AND d.full_date < '2026-09-01'
+WHERE d.full_date >= '{previous_start}' 
+  AND d.full_date < '{month_end}'
 
 GROUP BY f.facility_name;
